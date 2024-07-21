@@ -199,16 +199,29 @@ class PacServicio {
     private function validaResponse($data){
     	Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__);
 
-    	if ($this->response->estatus->codigo === "000") {
+    	if ( ! ($this->response->estatus->codigo === "000") ) {
+            Log::debug($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
     		$this->mensaje[] = $this->response->estatus->descripcion;
-    		$this->mensaje[] = sprintf("UUID = '%s'",$this->response->cfdiTimbrado->respuesta->uuid);
+    		//$this->mensaje[] = sprintf("CUFE = '%s'",$this->response->cfdiTimbrado->respuesta->uuid);
 
     		$this->estatus = true;
-    	} else {
-    		
-    		$this->mensaje[]= sprintf("Referencia:%s - Fecha de la solicitud: %s",$data['referencia'],$this->response->estatus->fecha);
 
-    		$this->mensaje[]= sprintf("%s-%s",$this->response->estatus->codigo, $this->response->estatus->informacionTecnica);
+            $this->response=[
+                'numeroDocumento'=> "00",
+                'cufe' => "d1f5e1b8c1d2f3a4567e8b9a1c0d2e3f",    
+            ];
+             
+    	} else {
+    		Log::debug($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
+    		$this->mensaje[]= sprintf("Referencia:%s - Fecha de la solicitud: %s",$data['encabezado']['numeroDocumento'],$this->response->estatus->fecha);
+
+    		$this->mensaje[]= sprintf("%s-%s",$this->response->estatus->codigo, $this->response->estatus->descripcion);
+
+
+            Log::debug($this->mensaje);
+
+
+            throw ValidationException::withMessages($this->mensaje);
     		
     	}
 

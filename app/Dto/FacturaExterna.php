@@ -51,53 +51,67 @@ class FacturaExterna
 
     public function parsear($data){
     	Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__);
-        Log::debug(print_r($data,true));
+        
         $data['calle'] = "LAGO ALBERTO";
         $data['no_exterior'] = "442";
         $data['no_interior'] ="TORRE A 5 PISO INT 503 A";
         $data['colonia']="ANAHUAC I SECCION"; 
         $data['municipio_alcaldia']="MIGUEL HIDALGO"; 
         $data['estado']="CIUDAD DE MEXICO"; 
-        
-        //Datos solo se usaran en produccion, para LOCAL y DEV se tiene que usar datos entregaedos po el proveedor
-        $data['rfcEmisor']= "CXM201015UN0";
-        $data['razon_social']= "COMERCIALIZADORA XPERTA MEXICO SA DE CV";
-        $data['regimen_fiscal']= "601";
-        $data['cp']="11320";
-        Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
-        
-        //$this->obtenerDatosCSF($data);
-        //$data = $this->data;
 
+
+        
         Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
-        //$this->obtenerCostoRecarga($data);
-        //$data = $this->data;
+        //Datos solo se usaran en produccion, para LOCAL y DEV se tiene que usar datos entregaedos po el proveedor
+        $rfcEmisor = "CXM201015UN0";
+        $razonSocial= "COMERCIALIZADORA XPERTA MEXICO SA DE CV";
+        $regimenFiscal= "601";
+        $domicilioFiscalEmisor="11320";
+        
+        $rfcReceptor = $data['receptor']['nombre'];
+        $razonSocialReceptor = $data['receptor']['numeroIdentificacion'];
+        $domicilioFiscalReceptor = "06470";
+        $regimenFiscalReceptor= "601";
+
+        //validar uso de los cps
+        $data['cp']=$domicilioFiscalEmisor; 
+        $data['cp_d']=$domicilioFiscalReceptor; 
+        
+        $receptorEmail = $data['receptor']['correoElectronico'];
+        
+        $folio = $data['encabezado']['numeroDocumento'];
+        $subTotalFactura = $data['totales']['subtotal'];
+        $totalFactura = $data['totales']['total'];
+
+        $emailMensaje = sprintf("Gracias por su prerencia ");
+        $usoCFDI = "G03";
 
         Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
         $this->obtenerCertificado($data);
+        
         $data = $this->data;
 
         Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__." ".config('app.env'));
 
+        
+
         if (config('app.env') === "local" || config('app.env') === "dev") {
             Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
-            $data['rfcEmisor']= "EKU9003173C9";
-            $data['razon_social']= "ESCUELA KEMPER URGATE";
-            $data['regimen_fiscal']= "601";
-            $data['cp']="06470";
+            $rfcEmisor= "EKU9003173C9";
+            $razonSocial= "ESCUELA KEMPER URGATE";
+            $regimenFiscal= "601";
+            $domicilioFiscalEmisor="06470";
 
-            $data['rfcReceptor']= "SSF1103037F1";
-            $data['razon_social_d']= "SCAFANDRA SOFTWARE FACTORY,";
-            $data['uso_cfdi'] = "G03";
-            $data['regimen_fiscal_d']= "601";
-            $data['cp_d']="06470"; 
+            $rfcReceptor= "SSF1103037F1";
+            $razonSocialReceptor= "SCAFANDRA SOFTWARE FACTORY,";
+            $usoCFDI = "G03";
+            $regimenFiscalReceptor= "601";
+            $domicilioFiscalReceptor="06470"; 
 
         } 
         
-
+        Log::debug(print_r($data,true));
         $dataParseado = array();
-
-        $emailMensaje = sprintf("Gracias por su prerencia ");
         
         $fecha = sprintf("%sT%s",carbon::now()->format('Y-m-d'),carbon::now()->format('H:i:s'));
         Log::info($fecha);
@@ -114,7 +128,7 @@ class FacturaExterna
          "NumeroDecimales" => "2", 
          "TipoCFDI" => "Ingreso", 
          "EnviaEmail" => true, 
-         "ReceptorEmail" => $data['email'], 
+         "ReceptorEmail" => $receptorEmail , 
          "ReceptorCC" => "", 
          "ReceptorCCO" => "", 
          "EmailMensaje" => $emailMensaje
@@ -123,30 +137,93 @@ class FacturaExterna
             "CFDIsRelacionados" => "", 
             "TipoRelacion" => "00", 
             "Emisor" => [
-               "RFC" => $data['rfcEmisor'], 
-               "NombreRazonSocial" => $data['razon_social'], 
-               "RegimenFiscal" => $data['regimen_fiscal'], 
+               "RFC" => $rfcEmisor, 
+               "NombreRazonSocial" => $razonSocial, 
+               "RegimenFiscal" => $regimenFiscal, 
                "Direccion" => array($this->direccion($data, self::REMITENTE))
             ], 
             "Receptor" => [
-                "RFC" => $data['rfcReceptor'], 
-                "NombreRazonSocial" => $data['razon_social_d'], 
-                "UsoCFDI" => $data['uso_cfdi'], 
-                "DomicilioFiscalReceptor" => $data['cp_d'], 
-                "RegimenFiscal" => $data['regimen_fiscal_d'], 
+                "RFC" => $rfcReceptor, 
+                "NombreRazonSocial" => $razonSocialReceptor, 
+                "UsoCFDI" => $usoCFDI, 
+                "DomicilioFiscalReceptor" => $domicilioFiscalReceptor, 
+                "RegimenFiscal" => $regimenFiscalReceptor, 
                 "Direccion" => $this->direccion($data, self::DESTINATARIO)
              ], 
             "Fecha" => $fecha, 
             "Serie" => "OK-", 
-            "Folio" => $data['referencia'], 
+            "Folio" => $folio, 
             "MetodoPago" => "PUE", 
             "FormaPago" => "03", 
             "Moneda" => "MXN", 
-            "LugarExpedicion" => $data['cp'], 
-            "SubTotal" => $data['costo_base'], 
-            "Total" => $data['precio'],
+            "LugarExpedicion" => $domicilioFiscalEmisor, 
+            "SubTotal" => $subTotalFactura, 
+            "Total" => $totalFactura,
         ], 
-        "Conceptos" => [
+        "Conceptos" => $this->detalle($data)
+        ]; //fin dataParseado 
+
+    	Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__);
+    	$this->data=$dataParseado;
+    }
+
+
+    /**
+     * Persea la llavae detalle, que tiene las partidas
+     * 
+     * @author Javier Hernandez
+     * @copyright 2024 EnviosOK
+     * @package App\Dto\Guias
+     * @api
+     * 
+     * @version 1.0.0
+     * 
+     * @since 1.0.0 Primera version de la funcion detalle
+     * 
+     * @throws \LogicException
+     *
+     * @param array $data Array con los datos de creacion de la guia
+     * 
+     * @var array $dataParseado Array que contendra la estructura del body  
+     * 
+     * 
+     * @return array $detalle Contine todas las partidas parseadas
+     */
+
+    private function detalle($data){
+
+        Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
+
+        $detalle = array();
+        foreach ($data['detalle'] as $key => $value) {
+            $detalle[]=[
+                "Cantidad" => $value['cantidad'], 
+                "CodigoUnidad" => "E48", 
+                "Unidad" => "Servicio", 
+                "CodigoProducto" => "80141706", 
+                "Producto" => $value['descripcion'], 
+                "PrecioUnitario" => $value['precioUnitario'], 
+                "Importe" => $value['subtotal'], 
+                "ObjetoDeImpuesto" => "02", 
+                "Impuestos" => [
+                    [
+                        "TipoImpuesto" => "1", 
+                        "Impuesto" => "2", 
+                        "Factor" => "1", 
+                        "Base" => $value['subtotal'], 
+                        "Tasa" => "0.160000", 
+                        "ImpuestoImporte" => $value['impuesto'],
+                    ] 
+                ] 
+            ];
+        }
+
+        Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
+        return $detalle;
+
+        /*
+
+        [
             [
                 "Cantidad" => "1", 
                 "CodigoUnidad" => "E48", 
@@ -168,11 +245,11 @@ class FacturaExterna
                 ] 
             ] 
         ] 
-        ]; //fin dataParseado 
+        */
 
-    	Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__);
-    	$this->data=$dataParseado;
     }
+    
+
 
 
     /**
@@ -199,7 +276,7 @@ class FacturaExterna
      */
 
     private function direccion($data, $tipo){
-        Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__." ".print_r($data,true));
+        
         $direccion = array();
         
         $comodinKey = "";
@@ -227,8 +304,6 @@ class FacturaExterna
             "Pais" => "Mexico", 
             "CodigoPostal" => $cp 
         ];
-        
-
 
         Log::info(__CLASS__." ".__FUNCTION__." ".__LINE__);
         return $direccion;
@@ -299,7 +374,7 @@ class FacturaExterna
      * 
      * @version 1.0.0
      * 
-     * @since 1.0.0 Primera version de la funcion obtenerDatosCSF
+     * @since 1.0.0 Primera version de la funcion obtenerCostoRecarga
      * 
      * @throws \LogicException
      *

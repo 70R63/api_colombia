@@ -9,11 +9,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
+use Carbon\Carbon;
+
 use Exception;
 use Illuminate\Validation\ValidationException;
 
 class ApiController extends Controller
 {
+
+
+    public $codeErrorHttp  = "404";
+
     /**
      * success response method.
      *
@@ -22,9 +28,12 @@ class ApiController extends Controller
     public function successResponse($message, $result = [], $code= 200 )
     {
         $response = [
-            'success' => true,
-            'message' => $message,
+            'estado' => true,
+            'mensajeRespuesta' => $message,
             'result'    => $result,
+            'codigoRespuesta'=>"00",
+            'fechaRespuesta' => Carbon::now("GMT-6")->toIso8601String(),
+            
 
         ];
 
@@ -38,12 +47,14 @@ class ApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendError($message, $result = [], $code = 404)
+    public function sendError($message,  $code = 404)
     {
         $response = [
-            'success' => false,
-            'message' => $message,
-            'result'    => $result,
+            'estado' => false,
+            'mensajeRespuesta' => $message,
+            'codigoRespuesta'=>"00",
+            'fechaRespuesta' => Carbon::now("GMT-6")->toIso8601String() ,
+           
 
         ];
 
