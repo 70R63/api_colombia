@@ -13,9 +13,11 @@
       </div>  
 
       <div class="card custom-card ">
-         <a href="{{ route('PacServicio.create') }}" class="btn badge-dark" >Crear</a>
+         <a href="{{ route('pac.create') }}" class="btn badge-dark" >Crear</a>
       </div>
    </div>
 </div>
-   
+
+
+
 @endsection

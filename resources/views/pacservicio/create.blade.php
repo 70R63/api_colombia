@@ -7,19 +7,27 @@
       <div class="card custom-card ">
          <div class="card-header border-bottom-0 custom-card-header">
             <div class="col-sm-12 col-md-10">
-                <h3 class="main-content-label mb-0">Crear nuevo CFDI</h3>
+                <h3 class="main-content-label mb-0">Crear nueva Factura Electronica</h3>
             </div>
         </div>
       </div>
 
       <div class="card custom-card ">
 
-         <form action="{{ route('PacServicio.store') }}" method="post">
+         <form action="{{ route('pac.store') }}" method="post">
             @csrf
-            <label for="fname">First name:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-            <label for="lname">Last name:</label>
-            <input type="text" id="lname" name="lname"><br><br>
+            
+            <label for="fname">Razón social:</label>
+            <input type="text" id="fname" name="receptor[nombre]"><br><br>
+
+            <label for="fname">NIT:</label>
+            <input type="text" id="fname" name="receptor[numeroIdentificacion]"><br><br>
+
+            <label for="fname">Receptor email:</label>
+            <input type="text" id="fname" name="receptor[correoElectronico]"><br><br>
+
+
+            
             <input type="submit" value="Submit">
          </form>
 

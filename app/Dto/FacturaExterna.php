@@ -68,8 +68,8 @@ class FacturaExterna
         $regimenFiscal= "601";
         $domicilioFiscalEmisor="11320";
         
-        $rfcReceptor = $data['receptor']['nombre'];
-        $razonSocialReceptor = $data['receptor']['numeroIdentificacion'];
+        $rfcReceptor = $data['receptor']['numeroIdentificacion'];
+        $razonSocialReceptor = $data['receptor']['nombre'];
         $domicilioFiscalReceptor = "06470";
         $regimenFiscalReceptor= "601";
 
@@ -196,6 +196,8 @@ class FacturaExterna
 
         $detalle = array();
         foreach ($data['detalle'] as $key => $value) {
+            
+
             $detalle[]=[
                 "Cantidad" => $value['cantidad'], 
                 "CodigoUnidad" => "E48", 
@@ -221,31 +223,6 @@ class FacturaExterna
         Log::info($this->numeroDeSolicitud." ".__CLASS__." ".__FUNCTION__." ".__LINE__);
         return $detalle;
 
-        /*
-
-        [
-            [
-                "Cantidad" => "1", 
-                "CodigoUnidad" => "E48", 
-                "Unidad" => "Servicio", 
-                "CodigoProducto" => "80141706", 
-                "Producto" => "Servicio de intermediación de productos", 
-                "PrecioUnitario" => $data['costo_base'], 
-                "Importe" => $data['costo_base'], 
-                "ObjetoDeImpuesto" => "02", 
-                "Impuestos" => [
-                    [
-                        "TipoImpuesto" => "1", 
-                        "Impuesto" => "2", 
-                        "Factor" => "1", 
-                        "Base" => $data['costo_base'], 
-                        "Tasa" => "0.160000", 
-                        "ImpuestoImporte" => $data['costo_iva']
-                    ] 
-                ] 
-            ] 
-        ] 
-        */
 
     }
     

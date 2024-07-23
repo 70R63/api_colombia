@@ -22,6 +22,10 @@
         <!-- Main Content-->
         <div class="main-content side-content pt-0">
             <div class="container-fluid p-4">
+
+                @include('mensajes.warning')
+                @include('mensajes.success')
+                
                 
                 <div class="inner-body">
                     <!-- Page Content -->
