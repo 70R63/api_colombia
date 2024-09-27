@@ -71,7 +71,7 @@ class PacServicioController extends Controller
         $nPacServicio = new nPacServicio($numeroDeSolicitud); 
         $nPacServicio->crear($data);
 
-        $success['Solicitud']="Exitosa";
+        
         $success = $nPacServicio->getresponse();
         $success['Solicitud']="Exito";
        // array_push($success, array("Solicitud" =>"Exito"));

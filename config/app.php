@@ -94,8 +94,9 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
+    
 
-    'cipher' => 'AES-256-CBC',
+    'cipher' => 'AES-128-CBC',
 
     'key' => env('APP_KEY'),
 

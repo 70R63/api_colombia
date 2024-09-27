@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
+use Config;
 
 //MODELS
 use App\Models\User as mUser;
@@ -82,8 +83,8 @@ class User {
 	    }
 
 	    $user = Auth::user(); 
-	    $tokenResult = $user->createToken('Personal Access Token');
-	    $token = $tokenResult->plainTextToken;
+	    $tokenResult = $user->createToken($data['email'],array('*'),Carbon::now()->addMinutes( Config::get("sanctum.expiration") ));
+	    $token = ($tokenResult->plainTextToken);
 
 	    $this->estatus = true;
 
